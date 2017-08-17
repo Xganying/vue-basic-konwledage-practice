@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vue-learn-practise</title>
+    <style>
+        .computed{
+            text-decoration: line-through;
+        }
+        .del{
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!--v-model 数据双向绑定-->
+    <div id="app">
+        <h1>{{ message }}</h1>
+        <input type="text" v-model="message"> 
+        <pre>{{ $data|json }}</pre>   
+    </div>
+
+
+
+    <!-- v-show 显示/隐藏-->
+    <div id="app">
+        <div class="error" v-show="!message">You must enter a message to submit(1)</div>
+        <div class="error" v-if="!message">You must enter a message to submit(2)</div>        
+        <textarea cols="50" rows="5" v-model="message"></textarea><br>
+        <button v-show="message">Send message</button>
+        <pre>{{ $data | json }}</pre>
+    </div>
+
+
+
+    <!-- events 事件 -->
+    <div id="app">
+        <form action="vue.html" v-on:submit.prevent="submitForm">
+            <button type="submit">Submit</button>
+        </form>
+        <button @click="updateCount"> Submit {{ count }}</button>
+    </div>
+
+
+
+    <!-- components 组件化-->
+    <div id="app">
+        <counter></counter>
+        <counter></counter>
+        <counter heading="likes" color="green"></counter>
+        <counter heading="Dislikes" color="red"></counter>
+    </div>
+
+
+
+    <!-- components 组件化-->
+    <template id="counter-template">
+        <h1>Hello</h1>
+        <button @click="count += 1">Submit {{ count }}</button>
+
+        <h1>{{ heading }}</h1>
+        <button @click="count += 1">Submit {{ count }}</button>
+    </template>
+
+    <!-- compouted -->
+    <div id="app">
+        Level {{ level }} <br>
+
+        username  {{ username }} <br>
+
+        <input type="text" v-model="first">
+        <input type="text" v-model="last">
+        
+    </div>
+
+   
+
+
+    <!-- render lists 列表输出 -->
+    <div id="app">
+        <ul>
+            <li @click="toggleTasks(task)" :class="task.computed ? 'computed' : ''" v-for="task in tasks">{{ task.body }}</li>
+        </ul>
+    </div>
+    
+
+
+
+    <!-- component dev -->
+     <div id="app">
+        <task-app :list="tasks"></task-app>
+        <task-app :list="[{body:'learn vue js', computed:false }]"></task-app>
+        <task-app :list="tasks"></task-app>
+    </div> 
+
+     <!-- component dev -->
+    <template id="task-template">
+         <ul>
+            <h1>
+                My tasks<span v-show="remaining">({{ remaining }})</span> 
+            </h1>
+            // @click="task.computed = !task.computed"
+            <li @click="toggleTasks(task)"  :class="{'computed': task.computed }" v-for="task in list">
+                {{ task.body }}
+                <strong class="del" @click="deleteTask(task)">×</strong>
+            </li>
+        </ul>
+    </template>
+
+
+
+
+    <script src="https://cdn.bootcss.com/vue/2.4.2/vue.js"></script>
+    <script>
+        
+        // v-model 数据绑定
+        new Vue({ 
+            el:'#app',
+            data:{
+                message:'hello, this is Cynthia speaking.'
+            }
+        })
+
+
+        // v-show v-if 显示
+        new Vue({
+            el:'#app',
+            data:{
+                message:''
+            }
+        })
+
+
+        // events 事件
+        new Vue({
+            el:"#app",
+            data:{
+                count:0
+            },
+            methods:{
+                // submitForm: function(e){
+                //     alert("submitForm");
+                //     // e.preventDefault(); // 阻止表单默认行为
+                // }
+                updateCount:function(){
+                    this.count += 1;
+                }
+            }
+        })
+
+
+        // components 组件化
+        Vue.component('counter',{
+        //    template: "<h1>Hello, this is Cynthia .</h1>"
+            template: "#counter-template",
+            props:['heading','color'],
+            data: function(){
+                return { count:0 }
+            }
+        })
+        new Vue({
+             el:"#app"
+        })
+
+
+
+        // computed
+        new Vue({
+            el:"#app",
+            data:{
+                points: 200,
+                first: 'Cynthia',
+                last: 'xie'
+            },
+            computed:{
+                level:function(){
+                    if(this.points <= 100 ){
+                        return '普通会员'
+                    }
+                    return "VIP会员";
+                },
+                username:function(){
+                    return this.first + ' ' + this.last;
+                }
+            }
+        })
+
+
+
+        //  component dev
+        Vue.component('task-app',{
+            template:"#task-template",
+            props:['list'],
+            methods:{
+                toggleTasks:function(task){
+                    task.computed = !task.computed;
+                },
+                deleteTask:function(task){
+                    this.list.$remove(task); // 删除数据
+                }
+            },
+            computed:{
+                remaining:function(){
+                    return this.list.filter(function(task){
+                        return ! task.computed;
+                    }).length;
+                }
+            }
+        });
+
+        // render lists 列表输出
+        new Vue({
+            el:"#app",
+            data:{
+                // compouted:'something',
+                tasks:[
+                    {body:'go to the mivie', computed:true },
+                    {body:'learn vue js in action', computed:false },
+                    {body:'go shopping', computed:true }
+                ]
+            }
+        })
+
+    </script>
+
+</body>
+</html>
